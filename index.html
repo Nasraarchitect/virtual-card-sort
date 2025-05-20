@@ -85,21 +85,21 @@
     });
 
     // Make each column sortable
-    for (let i = 1; i <= 7; i++) {
-     new Sortable(document.getElementById("rank-" + i), {
-  group: "shared",
-  animation: 150,
-  onAdd: function (evt) {
-    const targetList = evt.to;
-    if (targetList.children.length > 4) {
-      targetList.removeChild(evt.item); // remove from the column
-      evt.from.insertBefore(evt.item, evt.from.children[evt.oldIndex]); // send back to original spot
-      alert("Each column can have a maximum of 4 cards.");
+for (let i = 1; i <= 7; i++) {
+  new Sortable(document.getElementById("rank-" + i), {
+    group: "shared",
+    animation: 150,
+    onEnd: function (evt) {
+      const targetList = evt.to;
+      if (targetList.children.length > 4) {
+        // If more than 4 cards in the column, move the dragged item back
+        evt.from.insertBefore(evt.item, evt.from.children[evt.oldIndex]);
+        alert("You can only have 4 cards in a column.");
+      }
     }
-  }
-});
+  });
+}
 
-    }
 
     // Capture results
     document.getElementById("submit-btn").onclick = () => {
