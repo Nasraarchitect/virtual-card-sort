@@ -7,10 +7,21 @@
   <style>
     body {
       font-family: sans-serif;
+      margin: 20px;
       display: flex;
       flex-direction: column;
       align-items: center;
-      margin: 20px;
+    }
+
+    h2 {
+      margin-bottom: 0;
+      text-align: center;
+    }
+
+    p {
+      margin-top: 5px;
+      text-align: center;
+      max-width: 700px;
     }
 
     .columns {
@@ -18,12 +29,12 @@
       gap: 10px;
       width: 100%;
       justify-content: space-around;
-      margin-bottom: 20px;
+      margin: 30px 0;
     }
 
     .column {
       flex: 1;
-      min-width: 150px;
+      min-width: 140px;
       border: 1px solid #ccc;
       padding: 10px;
       min-height: 300px;
@@ -32,6 +43,7 @@
 
     .column h3 {
       text-align: center;
+      margin-top: 0;
     }
 
     .card {
@@ -45,13 +57,28 @@
     #submit-btn {
       padding: 10px 20px;
       font-size: 16px;
+      margin-bottom: 20px;
+    }
+
+    .arrow-container {
+      position: relative;
+      width: 90%;
+      height: 60px;
+      margin-top: 10px;
+    }
+
+    .arrow-label {
+      position: absolute;
+      right: 0;
+      top: 30px;
+      font-weight: bold;
     }
   </style>
 </head>
 <body>
 
-  <h2>Virtual Card Sort</h2>
-  <p>Drag up to 4 cards into each column based on importance (1 = least, 7 = most)</p>
+  <h2>What features are most important to a high-quality MPS school building?</h2>
+  <p><em>Please rank in order of importance and add no more than 4 features per column.</em></p>
 
   <div class="columns">
     <div class="column" id="rank-1"><h3>1</h3></div>
@@ -64,6 +91,20 @@
   </div>
 
   <button id="submit-btn">Submit</button>
+
+  <div class="arrow-container">
+    <svg width="100%" height="30">
+      <defs>
+        <marker id="arrowhead" markerWidth="10" markerHeight="7"
+                refX="10" refY="3.5" orient="auto">
+          <polygon points="0 0, 10 3.5, 0 7" fill="#000" />
+        </marker>
+      </defs>
+      <line x1="2%" y1="15" x2="98%" y2="15" stroke="#000" stroke-width="2"
+            marker-end="url(#arrowhead)" />
+    </svg>
+    <div class="arrow-label">Most Important</div>
+  </div>
 
   <script>
     const features = [
@@ -89,7 +130,7 @@
       "Strong civic presence / beautiful architecture"
     ];
 
-    // Add all features to column 1 by default
+    // Add cards to column 1 by default
     const col1 = document.getElementById("rank-1");
     features.forEach(text => {
       const card = document.createElement("div");
@@ -98,7 +139,7 @@
       col1.appendChild(card);
     });
 
-    // Enforce max 4 per column with onMove (this prevents move BEFORE drop)
+    // Limit each column to 4 cards using onMove
     for (let i = 1; i <= 7; i++) {
       new Sortable(document.getElementById("rank-" + i), {
         group: "shared",
@@ -107,13 +148,13 @@
           const targetList = evt.to;
           if (targetList !== evt.from && targetList.children.length >= 4) {
             alert("Each column can have a maximum of 4 cards.");
-            return false; // Cancel move
+            return false; // cancel the move
           }
         }
       });
     }
 
-    // Submission
+    // Submit logic
     document.getElementById("submit-btn").onclick = () => {
       const participant = prompt("Enter your name or initials (optional):") || "Anonymous";
       const results = { participant };
