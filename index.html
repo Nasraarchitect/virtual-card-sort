@@ -99,9 +99,24 @@
         const cards = Array.from(document.getElementById("rank-" + i).querySelectorAll(".card")).map(el => el.textContent);
         results["Rank " + i] = cards;
       }
-      console.log("Card Sort Results:", results);
-      alert("Check the console for results!");
-    };
+   const participantName = prompt("Enter your name or leave blank:");
+results.participant = participantName;
+
+fetch("https://script.google.com/macros/s/AKfycbzkiqb5OyiWvQ6LVGsa9V7L8-pemoVlPC5IieM7H8-Zp4d5EQpgfrtn-pwZh16akWnz5w/exec", {
+  method: "POST",
+  body: JSON.stringify(results),
+  headers: {
+    "Content-Type": "application/json"
+  }
+})
+.then(res => {
+  if (res.ok) {
+    alert("Thank you! Your responses were submitted.");
+  } else {
+    alert("Error submitting response.");
+  }
+});
+
   </script>
 
 </body>
