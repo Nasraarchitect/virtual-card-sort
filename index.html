@@ -87,9 +87,17 @@
     // Make each column sortable
     for (let i = 1; i <= 7; i++) {
       new Sortable(document.getElementById("rank-" + i), {
-        group: "shared",
-        animation: 150
-      });
+  group: "shared",
+  animation: 150,
+  onAdd: function (evt) {
+    const targetList = evt.to;
+    if (targetList.children.length > 4) {
+      evt.from.appendChild(evt.item);  // move it back to where it came from
+      alert("You can only place 4 cards in each priority column.");
+    }
+  }
+});
+
     }
 
     // Capture results
