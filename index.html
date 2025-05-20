@@ -8,19 +8,32 @@
     body {
       font-family: sans-serif;
       display: flex;
-      gap: 10px;
+      flex-direction: column;
+      align-items: center;
       margin: 20px;
     }
+
+    .columns {
+      display: flex;
+      gap: 10px;
+      width: 100%;
+      justify-content: space-around;
+      margin-bottom: 20px;
+    }
+
     .column {
       flex: 1;
+      min-width: 150px;
       border: 1px solid #ccc;
       padding: 10px;
       min-height: 300px;
       background: #f4f4f4;
     }
+
     .column h3 {
       text-align: center;
     }
+
     .card {
       background: white;
       padding: 8px;
@@ -28,10 +41,8 @@
       border: 1px solid #999;
       cursor: grab;
     }
+
     #submit-btn {
-      position: fixed;
-      bottom: 20px;
-      left: 20px;
       padding: 10px 20px;
       font-size: 16px;
     }
@@ -39,43 +50,46 @@
 </head>
 <body>
 
-  <!-- Seven columns for priority levels -->
-  <div class="column" id="rank-1"><h3>1</h3></div>
-  <div class="column" id="rank-2"><h3>2</h3></div>
-  <div class="column" id="rank-3"><h3>3</h3></div>
-  <div class="column" id="rank-4"><h3>4</h3></div>
-  <div class="column" id="rank-5"><h3>5</h3></div>
-  <div class="column" id="rank-6"><h3>6</h3></div>
-  <div class="column" id="rank-7"><h3>7</h3></div>
+  <h2>Virtual Card Sort</h2>
+  <p>Drag up to 4 cards into each column based on importance (1 = least, 7 = most)</p>
+
+  <div class="columns">
+    <div class="column" id="rank-1"><h3>1</h3></div>
+    <div class="column" id="rank-2"><h3>2</h3></div>
+    <div class="column" id="rank-3"><h3>3</h3></div>
+    <div class="column" id="rank-4"><h3>4</h3></div>
+    <div class="column" id="rank-5"><h3>5</h3></div>
+    <div class="column" id="rank-6"><h3>6</h3></div>
+    <div class="column" id="rank-7"><h3>7</h3></div>
+  </div>
 
   <button id="submit-btn">Submit</button>
 
   <script>
-    // List of features
     const features = [
       "ADA accessible buildings",
-      "Adequate outdoor amenities",
+      "Adequate outdoor amenities (Athletic fields, playground etc.)",
       "Adequate Parking",
-      "Adequate support spaces",
+      "Adequate support spaces (Counseling, pullout instruction, etc.)",
       "Adequately sized cafeteria",
       "Adequately sized gym and PE spaces",
-      "Adequately sized kitchen space",
-      "Adequately sized performance/assembly space",
-      "Ample community/shared use spaces",
-      "Appropriately sized building",
+      "Adequately sized kitchen space (Can support production cooking)",
+      "Adequately sized performance / assembly space with stage",
+      "Ample community / shared use spaces",
+      "Appropriately sized building allowing for efficient/optimal use of space",
       "Classrooms with natural light",
       "Energy-efficient building systems",
-      "Flexible, non-classroom learning spaces",
+      "Flexible, non-classroom learning spaces (breakout areas, student commons, etc.)",
       "Healthy and well-maintained facility",
       "HVAC and thermal Comfort",
-      "Purpose-built specials classrooms",
-      "Safe and efficient student pickup/drop-off",
+      "Purpose-built specials classrooms (Science, art, music)",
+      "Safe and efficient student pickup and drop-off areas",
       "Safe and secure campus",
-      "Spaces that support unique programming",
+      "Spaces that Support unique Programming (CTE,media production, etc.)",
       "Strong civic presence / beautiful architecture"
     ];
 
-    // Add cards to the first column initially
+    // Add all features to column 1 by default
     const col1 = document.getElementById("rank-1");
     features.forEach(text => {
       const card = document.createElement("div");
@@ -84,48 +98,46 @@
       col1.appendChild(card);
     });
 
-    // Make each column sortable
-for (let i = 1; i <= 7; i++) {
-  new Sortable(document.getElementById("rank-" + i), {
-    group: "shared",
-    animation: 150,
-    onEnd: function (evt) {
-      const targetList = evt.to;
-      if (targetList.children.length > 4) {
-        // If more than 4 cards in the column, move the dragged item back
-        evt.from.insertBefore(evt.item, evt.from.children[evt.oldIndex]);
-        alert("You can only have 4 cards in a column.");
-      }
+    // Enforce max 4 per column with onMove (this prevents move BEFORE drop)
+    for (let i = 1; i <= 7; i++) {
+      new Sortable(document.getElementById("rank-" + i), {
+        group: "shared",
+        animation: 150,
+        onMove: function (evt) {
+          const targetList = evt.to;
+          if (targetList !== evt.from && targetList.children.length >= 4) {
+            alert("Each column can have a maximum of 4 cards.");
+            return false; // Cancel move
+          }
+        }
+      });
     }
-  });
-}
 
-
-    // Capture results
+    // Submission
     document.getElementById("submit-btn").onclick = () => {
-      const results = {};
+      const participant = prompt("Enter your name or initials (optional):") || "Anonymous";
+      const results = { participant };
+
       for (let i = 1; i <= 7; i++) {
         const cards = Array.from(document.getElementById("rank-" + i).querySelectorAll(".card")).map(el => el.textContent);
         results["Rank " + i] = cards;
       }
-   const participantName = prompt("Enter your name or leave blank:");
-results.participant = participantName;
 
-fetch("https://script.google.com/macros/s/AKfycbzkiqb5OyiWvQ6LVGsa9V7L8-pemoVlPC5IieM7H8-Zp4d5EQpgfrtn-pwZh16akWnz5w/exec", {
-  method: "POST",
-  body: JSON.stringify(results),
-  headers: {
-    "Content-Type": "application/json"
-  }
-})
-.then(res => {
-  if (res.ok) {
-    alert("Thank you! Your responses were submitted.");
-  } else {
-    alert("Error submitting response.");
-  }
-});
-
+      fetch("https://script.google.com/macros/s/AKfycbzkiqb5OyiWvQ6LVGsa9V7L8-pemoVlPC5IieM7H8-Zp4d5EQpgfrtn-pwZh16akWnz5w/exec", {
+        method: "POST",
+        body: JSON.stringify(results),
+        headers: {
+          "Content-Type": "application/json"
+        }
+      })
+      .then(res => {
+        if (res.ok) {
+          alert("Thank you! Your response has been submitted.");
+        } else {
+          alert("There was an error submitting your response.");
+        }
+      });
+    };
   </script>
 
 </body>
