@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -89,7 +88,6 @@
     <div class="column" id="rank-5"><h3>5</h3></div>
     <div class="column" id="rank-6"><h3>6</h3></div>
     <div class="column" id="rank-7"><h3>7<br><span style="font-size: 0.9em;">Most Important</span></h3></div>
-
   </div>
 
   <button id="submit-btn">Submit</button>
@@ -132,54 +130,53 @@
       "Strong civic presence / beautiful architecture"
     ];
 
-    // Add cards to column 1 by default
-    const col1 = document.getElementById("rank-1");
-    features.forEach(text => {
-      const card = document.createElement("div");
-      card.className = "card";
-      card.textContent = text;
-      col1.appendChild(card);
-    });
-
-    // Limit each column to 4 cards using onMove
-    for (let i = 1; i <= 7; i++) {
-      new Sortable(document.getElementById("rank-" + i), {
-        group: "shared",
-        animation: 150,
-        onMove: function (evt) {
-          const targetList = evt.to;
-          if (targetList !== evt.from && targetList.children.length >= 4) {
-            alert("Each column can have a maximum of 4 cards.");
-            return false; // cancel the move
-          }
-        }
+    window.onload = () => {
+      const col1 = document.getElementById("rank-1");
+      features.forEach(text => {
+        const card = document.createElement("div");
+        card.className = "card";
+        card.textContent = text;
+        col1.appendChild(card);
       });
-    }
-
-    // Submit logic
-    document.getElementById("submit-btn").onclick = () => {
-      const participant = prompt("Enter your name or initials (optional):") || "Anonymous";
-      const results = { participant };
 
       for (let i = 1; i <= 7; i++) {
-        const cards = Array.from(document.getElementById("rank-" + i).querySelectorAll(".card")).map(el => el.textContent);
-        results["Rank " + i] = cards;
+        new Sortable(document.getElementById("rank-" + i), {
+          group: "shared",
+          animation: 150,
+          onMove: function (evt) {
+            const targetList = evt.to;
+            if (targetList !== evt.from && targetList.children.length >= 4) {
+              alert("Each column can have a maximum of 4 cards.");
+              return false;
+            }
+          }
+        });
       }
 
-      fetch(https://script.google.com/macros/s/AKfycbzkiqb5OyiWvQ6LVGsa9V7L8-pemoVlPC5IieM7H8-Zp4d5EQpgfrtn-pwZh16akWnz5w/exec), {
-        method: "POST",
-        body: JSON.stringify(results),
-        headers: {
-          "Content-Type": "application/json"
+      document.getElementById("submit-btn").onclick = () => {
+        const participant = prompt("Enter your name or initials (optional):") || "Anonymous";
+        const results = { participant };
+
+        for (let i = 1; i <= 7; i++) {
+          const cards = Array.from(document.getElementById("rank-" + i).querySelectorAll(".card")).map(el => el.textContent);
+          results["Rank " + i] = cards;
         }
-      })
-      .then(res => {
-        if (res.ok) {
-          alert("Thank you! Your response has been submitted.");
-        } else {
-          alert("There was an error submitting your response.");
-        }
-      });
+
+        fetch("https://script.google.com/macros/s/AKfycbzkiqb5OyiWvQ6LVGsa9V7L8-pemoVlPC5IieM7H8-Zp4d5EQpgfrtn-pwZh16akWnz5w/exec", {
+          method: "POST",
+          body: JSON.stringify(results),
+          headers: {
+            "Content-Type": "application/json"
+          }
+        })
+        .then(res => {
+          if (res.ok) {
+            alert("Thank you! Your response has been submitted.");
+          } else {
+            alert("There was an error submitting your response.");
+          }
+        });
+      };
     };
   </script>
 
