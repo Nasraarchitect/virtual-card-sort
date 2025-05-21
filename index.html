@@ -24,6 +24,19 @@
       max-width: 700px;
     }
 
+    .card-pool {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 10px;
+      max-width: 1200px;
+      margin: 30px 0 10px;
+      padding: 10px;
+      border: 2px dashed #aaa;
+      min-height: 150px;
+      background: #f9f9f9;
+    }
+
     .columns {
       display: flex;
       gap: 10px;
@@ -49,9 +62,12 @@
     .card {
       background: white;
       padding: 8px;
-      margin: 5px 0;
+      margin: 4px 0;
       border: 1px solid #999;
       cursor: grab;
+      width: 100%;
+      max-width: 200px;
+      text-align: center;
     }
 
     #submit-btn {
@@ -80,6 +96,10 @@
   <h2>What features are most important to a high-quality MPS school building?</h2>
   <p><em>Please rank in order of importance and add no more than 4 features per column.</em></p>
 
+  <!-- Card pool at top -->
+  <div class="card-pool" id="card-pool"></div>
+
+  <!-- Ranking columns -->
   <div class="columns">
     <div class="column" id="rank-1"><h3>1</h3></div>
     <div class="column" id="rank-2"><h3>2</h3></div>
@@ -92,6 +112,7 @@
 
   <button id="submit-btn">Submit</button>
 
+  <!-- Arrow -->
   <div class="arrow-container">
     <svg width="100%" height="30">
       <defs>
@@ -131,14 +152,21 @@
     ];
 
     window.onload = () => {
-      const col1 = document.getElementById("rank-1");
+      const pool = document.getElementById("card-pool");
       features.forEach(text => {
         const card = document.createElement("div");
         card.className = "card";
         card.textContent = text;
-        col1.appendChild(card);
+        pool.appendChild(card);
       });
 
+      // Make pool sortable
+      new Sortable(pool, {
+        group: "shared",
+        animation: 150
+      });
+
+      // Make each column sortable with 4-card max
       for (let i = 1; i <= 7; i++) {
         new Sortable(document.getElementById("rank-" + i), {
           group: "shared",
@@ -153,6 +181,7 @@
         });
       }
 
+      // Submit logic
       document.getElementById("submit-btn").onclick = () => {
         const participant = prompt("Enter your name or initials (optional):") || "Anonymous";
         const results = { participant };
