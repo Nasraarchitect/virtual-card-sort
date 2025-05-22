@@ -142,10 +142,10 @@
         const formData = new FormData();
         formData.append("data", JSON.stringify(results));
 
-        fetch("https://script.google.com/macros/s/AKfycbzrMSpoHaqTCvyZdnGupu_lqE-4y8ueKvgJcImWEnQ7v5lMLCx8Tmhvu5Udslr4iTXMsg/exec", {
-          method: "POST",
-          body: formData
-        })
+        fetch("https://script.google.com/macros/s/NEW_DEPLOYMENT_ID/exec", {
+  method: "POST",
+  body: formData
+})
         .then(res => res.text())
         .then(msg => alert("Server says: " + msg))
         .catch(err => alert("Error submitting: " + err.message));
