@@ -1,0 +1,102 @@
+<!-- Rebuild trigger -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Virtual Card Sort</title>
+  <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
+  <style>
+    body { font-family: sans-serif; margin: 20px; display: flex; flex-direction: column; align-items: center; }
+    h2, p { text-align: center; max-width: 700px; }
+    .card-pool { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; max-width: 1200px; margin: 30px 0 10px; padding: 10px; border: 2px dashed #aaa; background: #f9f9f9; }
+    .columns { display: flex; gap: 10px; width: 100%; justify-content: space-around; margin: 30px 0; }
+    .column { flex: 1; min-width: 140px; border: 1px solid #ccc; padding: 10px; min-height: 300px; background: #f4f4f4; }
+    .column h3 { text-align: center; margin-top: 0; }
+    .card { background: white; padding: 8px; margin: 4px 0; border: 1px solid #999; cursor: grab; width: 100%; max-width: 200px; text-align: center; }
+    #submit-btn { padding: 10px 20px; font-size: 16px; margin-bottom: 20px; }
+    .arrow-container { position: relative; width: 90%; height: 60px; margin-top: 10px; }
+    .arrow-label { position: absolute; right: 0; top: 30px; font-weight: bold; }
+  </style>
+</head>
+<body>
+  <h2>What features are most important to a high-quality MPS school building?</h2>
+  <p><em>Please rank in order of importance and add no more than 4 features per column.</em></p>
+  <div class="card-pool" id="card-pool"></div>
+  <div class="columns">
+    <div class="column" id="rank-1"><h3>1</h3></div>
+    <div class="column" id="rank-2"><h3>2</h3></div>
+    <div class="column" id="rank-3"><h3>3</h3></div>
+    <div class="column" id="rank-4"><h3>4</h3></div>
+    <div class="column" id="rank-5"><h3>5</h3></div>
+    <div class="column" id="rank-6"><h3>6</h3></div>
+    <div class="column" id="rank-7"><h3>7<br><span style="font-size: 0.9em;">Most Important</span></h3></div>
+  </div>
+  <button id="submit-btn">Submit</button>
+  <div class="arrow-container">
+    <svg width="100%" height="30">
+      <defs>
+        <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+          <polygon points="0 0, 10 3.5, 0 7" fill="#000" />
+        </marker>
+      </defs>
+      <line x1="2%" y1="15" x2="98%" y2="15" stroke="#000" stroke-width="2" marker-end="url(#arrowhead)" />
+    </svg>
+    <div class="arrow-label">Most Important</div>
+  </div>
+  <script>
+    const features = [
+      "ADA accessible buildings", "Adequate outdoor amenities", "Adequate Parking", "Adequate support spaces",
+      "Adequately sized cafeteria", "Adequately sized gym and PE spaces", "Adequately sized kitchen space",
+      "Adequately sized performance / assembly space", "Ample community / shared use spaces",
+      "Appropriately sized building", "Classrooms with natural light", "Energy-efficient building systems",
+      "Flexible, non-classroom learning spaces", "Healthy and well-maintained facility", "HVAC and thermal Comfort",
+      "Purpose-built specials classrooms", "Safe and efficient student pickup and drop-off areas",
+      "Safe and secure campus", "Spaces that Support unique Programming", "Strong civic presence"
+    ];
+
+    window.onload = () => {
+      const pool = document.getElementById("card-pool");
+      features.forEach(text => {
+        const card = document.createElement("div");
+        card.className = "card";
+        card.textContent = text;
+        pool.appendChild(card);
+      });
+
+      new Sortable(pool, { group: "shared", animation: 150 });
+      for (let i = 1; i <= 7; i++) {
+        new Sortable(document.getElementById("rank-" + i), {
+          group: "shared", animation: 150,
+          onMove: evt => {
+            if (evt.to !== evt.from && evt.to.children.length >= 4) {
+              alert("Each column can have a maximum of 4 cards.");
+              return false;
+            }
+          }
+        });
+      }
+
+      document.getElementById("submit-btn").onclick = () => {
+        const participant = prompt("Enter your name or initials (optional):") || "Anonymous";
+        const results = { participant };
+        for (let i = 1; i <= 7; i++) {
+          results["Rank " + i] = Array.from(document.getElementById("rank-" + i).querySelectorAll(".card")).map(el => el.textContent);
+        }
+
+        fetch("https://script.google.com/macros/s/AKfycbzrMSpoHaqTCvyZdnGupu_lqE-4y8ueKvgJcImWEnQ7v5lMLCx8Tmhvu5Udslr4iTXMsg/exec", {
+          method: "POST",
+          body: JSON.stringify(results),
+          headers: { "Content-Type": "application/json" }
+        })
+        .then(res => {
+          if (res.ok) {
+            alert("Thank you! Your response has been submitted.");
+          } else {
+            alert("There was an error submitting your response.");
+          }
+        });
+      };
+    };
+  </script>
+</body>
+</html>
